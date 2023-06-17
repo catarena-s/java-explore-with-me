@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.dto.EndpointHitDto;
 import ru.practicum.dto.ViewStatsDto;
-import ru.practicum.exeption.ValidateException;
 import ru.practicum.service.StatsService;
 
 import javax.validation.Valid;
@@ -53,20 +52,21 @@ public class StatsServerController {
                                        @RequestParam(name = "uris", required = false) String[] uris,
                                        @RequestParam(name = "unique", defaultValue = "false") boolean unique
     ) {
-        final List<String> path = new ArrayList<>();
+        final String pathStr = getPathStr(start, end, uris, unique);
+        log.debug("Request received GET '{}?{}'", STATS_ENDPOINT, pathStr);
 
+        return statsService.getStats(start, end, uris, unique)
+                .stream().sorted()
+                .collect(Collectors.toList());
+    }
+
+    private String getPathStr(LocalDateTime start, LocalDateTime end, String[] uris, boolean unique) {
+        final List<String> path = new ArrayList<>();
         if (start != null) path.add("start=" + start.format(FORMATTER));
         if (end != null) path.add("end=" + end.format(FORMATTER));
         if (uris != null) path.add("uris=" + String.join("&uris=", uris));
         path.add("unique=" + unique);
 
-        log.debug("Request received GET '{}?{}'", STATS_ENDPOINT, String.join("&", path));
-
-        if (start != null && end != null && start.isAfter(end)) {
-            throw new ValidateException("Start time must be before end end");
-        }
-        return statsService.getStats(start, end, uris, unique)
-                .stream().sorted()
-                .collect(Collectors.toList());
+        return String.join("&", path);
     }
 }

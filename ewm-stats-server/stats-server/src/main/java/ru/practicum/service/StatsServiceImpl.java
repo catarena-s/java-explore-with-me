@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.dto.EndpointHitDto;
 import ru.practicum.dto.ViewStatsDto;
+import ru.practicum.exeption.ValidateException;
 import ru.practicum.model.EndpointHit;
 import ru.practicum.model.EndpointHitFilter;
 import ru.practicum.model.EndpointHitMapper;
@@ -43,6 +44,9 @@ public class StatsServiceImpl implements StatsService {
 
     @Override
     public List<ViewStatsDto> getStats(LocalDateTime start, LocalDateTime end, String[] uris, Boolean unique) {
+        if (start != null && end != null && start.isAfter(end)) {
+            throw new ValidateException("Start time must be before end end");
+        }
         final EndpointHitFilter filter = EndpointHitFilter.builder()
                 .timestampAfter(start)
                 .timestampBefore(end)
