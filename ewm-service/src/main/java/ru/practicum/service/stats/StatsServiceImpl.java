@@ -23,6 +23,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class StatsServiceImpl implements StatsService {
+    public static final LocalDateTime START = LocalDateTime.of(1900, 1, 1, 0, 0, 0);
+    public static final LocalDateTime END = LocalDateTime.of(2222, 12, 31, 23, 59, 59);
     @Autowired
     private final StatsClient statsClient;
     @Value(value = "${app.name}")
@@ -40,7 +42,7 @@ public class StatsServiceImpl implements StatsService {
 
     @Override
     public Map<String, Long> getMap(HttpServletRequest request, List<Long> collect, boolean unique) {
-        final List<ViewStatsDto> viewStats = get(request, collect, null, null, unique);
+        final List<ViewStatsDto> viewStats = get(request, collect, START, END, unique);
         return getGroupedMap(viewStats);
     }
 
@@ -52,7 +54,7 @@ public class StatsServiceImpl implements StatsService {
 
     @Override
     public Map<String, Long> getMap(HttpServletRequest request, boolean unique) {
-        final List<ViewStatsDto> viewStats = get(request, null, null, null, unique);
+        final List<ViewStatsDto> viewStats = get(request, null, START, END, unique);
         return getGroupedMap(viewStats);
     }
 
