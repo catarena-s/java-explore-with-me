@@ -1,4 +1,4 @@
-package ru.practicum.api.privet;
+package ru.practicum.api.privat;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,7 @@ import java.util.List;
 @RequestMapping(path = "/users/{userId}")
 @RequiredArgsConstructor
 @Slf4j
-public class PrivetRequestController {
+public class PrivateRequestController {
     private final RequestService requestService;
 
     @PostMapping("/requests")

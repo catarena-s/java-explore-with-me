@@ -1,4 +1,4 @@
-package ru.practicum.api.privet;
+package ru.practicum.api.privat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,8 +33,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.practicum.Constants.FORMATTER;
 
-@WebMvcTest(controllers = PrivetEventController.class)
-class PrivetEventControllerTest {
+@WebMvcTest(controllers = PrivateEventController.class)
+class PrivateEventControllerTest {
     @MockBean
     private EventService service;
     @Autowired

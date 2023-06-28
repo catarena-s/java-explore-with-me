@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.EventShortDto;
 import ru.practicum.enums.EventState;
+import ru.practicum.enums.SortType;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.mapper.EventMapper;
 import ru.practicum.model.Category;
@@ -148,26 +149,10 @@ class PublicEventServiceImplTest {
                 .thenReturn(mapViewStats);
 
         final List<EventShortDto> alist = service.getPublishedEvents(
-                text, catIdList, true, rangeStart, rangeEnd, onlyAvailable, sort,
+                text, catIdList, true, rangeStart, rangeEnd, onlyAvailable, SortType.from(sort),
                 from, size, httpServletRequest);
 
         assertEquals(collect, alist);
-    }
-
-    @Test
-    void getPublishedEvents_throwException_whenUnknownSort() {
-        final String sort = "WRONG_SORT";
-
-        final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> service.getPublishedEvents("text", catIdList, true, rangeStart, rangeEnd, true, sort,
-                        from, size, httpServletRequest));
-
-        assertEquals("Unknown sort type: WRONG_SORT", exception.getMessage());
-
-        verify(httpServletRequest, never()).getRequestURI();
-        verify(repository, never()).findAll();
-        verify(statsService, never()).save(httpServletRequest);
-        verify(statsService, never()).getMap(httpServletRequest, ids, false);
     }
 
     @Test

@@ -1,4 +1,4 @@
-package ru.practicum.api.privet;
+package ru.practicum.api.privat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,8 +27,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.practicum.Constants.FORMATTER;
 
-@WebMvcTest(controllers = PrivetRequestController.class)
-class PrivetRequestControllerTest {
+@WebMvcTest(controllers = PrivateRequestController.class)
+class PrivateRequestControllerTest {
     @MockBean
     private RequestService service;
     @Autowired
@@ -61,7 +61,7 @@ class PrivetRequestControllerTest {
                 .build();
         eventRequest = EventRequestStatusUpdateRequest.builder()
                 .requestIds(List.of(1L, 2L))
-                .status("CONFIRMED")
+                .status(RequestStatus.CONFIRMED)
                 .build();
         updatedRequest = EventRequestStatusUpdateResult.builder()
                 .confirmedRequests(List.of(requestDto1, requestDto2))

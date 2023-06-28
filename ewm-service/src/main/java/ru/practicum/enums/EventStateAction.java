@@ -1,6 +1,9 @@
 package ru.practicum.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Getter;
+
+import static ru.practicum.mapper.EnumMapper.getEnumFromString;
 
 @Getter
 public enum EventStateAction {
@@ -15,12 +18,8 @@ public enum EventStateAction {
         this.eventState = eventState;
     }
 
+    @JsonCreator
     public static EventStateAction from(String name) {
-        for (EventStateAction esa : values()) {
-            if (esa.name().equalsIgnoreCase(name)) {
-                return esa;
-            }
-        }
-        throw new IllegalArgumentException("Unknown event state action: " + name);
+        return getEnumFromString(EventStateAction.class, name, "Unknown event state action");
     }
 }

@@ -1,8 +1,9 @@
-package ru.practicum.api.privet;
+package ru.practicum.api.privat;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,7 +31,8 @@ import static ru.practicum.utils.Constants.PAGE_SIZE;
 @RequestMapping(path = "/users/{userId}/events")
 @RequiredArgsConstructor
 @Slf4j
-public class PrivetEventController {
+@Validated
+public class PrivateEventController {
     private final EventService eventService;
 
     @PostMapping

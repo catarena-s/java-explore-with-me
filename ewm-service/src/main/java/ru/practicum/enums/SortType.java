@@ -1,6 +1,9 @@
 package ru.practicum.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Getter;
+
+import static ru.practicum.mapper.EnumMapper.getEnumFromString;
 
 @Getter
 public enum SortType {
@@ -13,12 +16,8 @@ public enum SortType {
         this.name = name;
     }
 
+    @JsonCreator
     public static SortType from(String name) {
-        for (SortType sortType : values()) {
-            if (sortType.name().equalsIgnoreCase(name)) {
-                return sortType;
-            }
-        }
-        throw new IllegalArgumentException("Unknown sort type: " + name);
+        return getEnumFromString(SortType.class, name,"Unknown sort type");
     }
 }

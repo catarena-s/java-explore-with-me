@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.dto.category.CategoryDto;
 import ru.practicum.dto.category.NewCategoryDto;
 import ru.practicum.exception.ConflictException;
@@ -23,7 +22,6 @@ import static ru.practicum.utils.Constants.THE_REQUIRED_OBJECT_WAS_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
     private final EventRepository eventRepository;
@@ -37,7 +35,6 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    @Transactional
     public CategoryDto saveCategory(NewCategoryDto body) {
         try {
             final Category category = categoryRepository.save(CategoryMapper.fromDto(body));
@@ -50,7 +47,6 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    @Transactional
     public void delete(long catId) {
         if (!categoryRepository.existsById(catId)) {
             throw new NotFoundException(
@@ -67,7 +63,6 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    @Transactional
     public CategoryDto updateCategory(CategoryDto body, long catId) {
         if (categoryRepository.existsByIdNotAndName(catId, body.getName())) {
             throw new ConflictException(

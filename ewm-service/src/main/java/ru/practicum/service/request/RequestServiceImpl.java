@@ -28,12 +28,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.lang.Boolean.FALSE;
+import static ru.practicum.enums.RequestStatus.*;
 import static ru.practicum.enums.RequestStatus.CONFIRMED;
 import static ru.practicum.enums.RequestStatus.REJECTED;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class RequestServiceImpl implements RequestService {
 
     private final RequestRepository requestRepository;
@@ -84,7 +84,7 @@ public class RequestServiceImpl implements RequestService {
                 .event(event)
                 .status((event.getParticipantLimit() == 0) || (!event.getRequestModeration())
                         ? CONFIRMED
-                        : RequestStatus.PENDING
+                        : PENDING
                 )
                 .created(LocalDateTime.now())
                 .build();
@@ -99,7 +99,6 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    @Transactional
     public ParticipationRequestDto cancelRequest(long userId, long requestId) {
         userService.checkExistById(userId);
 
@@ -108,7 +107,7 @@ public class RequestServiceImpl implements RequestService {
                         String.format("Request with id=%d for userId=%d was not found.", requestId, userId),
                         Constants.THE_REQUIRED_OBJECT_WAS_NOT_FOUND));
 
-        request.setStatus(RequestStatus.CANCELED);
+        request.setStatus(CANCELED);
         requestRepository.save(request);
 
         return RequestMapper.toDto(request);
@@ -146,7 +145,7 @@ public class RequestServiceImpl implements RequestService {
     @Override
     @Transactional
     public EventRequestStatusUpdateResult changeRequestStatus(EventRequestStatusUpdateRequest body, long userId, long eventId) {
-        final RequestStatus newStatus = RequestStatus.from(body.getStatus());
+        final RequestStatus newStatus = body.getStatus();
         userService.checkExistById(userId);
         final Event event = eventService.findEventById(eventId);
         if (!event.getInitiator().getId().equals(userId)) {
@@ -166,7 +165,7 @@ public class RequestServiceImpl implements RequestService {
                     "Conflict confirmed exception");
         }
         //находим заявки в режиме ожидания по списку id
-        final List<Request> requestList = requestRepository.findAllByIdInAndStatus(requestIds, RequestStatus.PENDING);
+        final List<Request> requestList = requestRepository.findAllByIdInAndStatus(requestIds, PENDING);
         if (requestList.size() != requestIds.size()) {
             // статус можно изменить только у заявок, находящихся в состоянии ожидания (Ожидается код ошибки 409)
             throw new ConflictException("Status change is only possible for requests with state='PENDING'");

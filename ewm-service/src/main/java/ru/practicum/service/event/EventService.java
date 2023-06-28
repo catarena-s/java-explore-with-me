@@ -5,6 +5,7 @@ import ru.practicum.dto.event.EventShortDto;
 import ru.practicum.dto.event.NewEventDto;
 import ru.practicum.dto.event.UpdateEventAdminRequest;
 import ru.practicum.dto.event.UpdateEventUserRequest;
+import ru.practicum.enums.SortType;
 import ru.practicum.model.Event;
 
 import javax.servlet.http.HttpServletRequest;
@@ -69,7 +70,7 @@ public interface EventService {
      */
     List<EventShortDto> getPublishedEvents(String text, List<Long> categories, Boolean paid,
                                            LocalDateTime rangeStart, LocalDateTime rangeEnd,
-                                           Boolean onlyAvailable, String sort,
+                                           Boolean onlyAvailable, SortType sort,
                                            Integer from, Integer size, HttpServletRequest request);
 
 

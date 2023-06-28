@@ -16,6 +16,7 @@ import ru.practicum.dto.event.NewEventDto;
 import ru.practicum.dto.event.UpdateEventUserRequest;
 import ru.practicum.dto.location.LocationDto;
 import ru.practicum.enums.EventState;
+import ru.practicum.enums.EventStateAction;
 import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.exception.ValidateException;
@@ -264,7 +265,7 @@ class PrivetEventServiceImplTest {
     @ValueSource(strings = {"SEND_TO_REVIEW", "CANCEL_REVIEW"})
     void updateEvent_changeState_whenEventPending(String newState) {
         final UpdateEventUserRequest newBody = new UpdateEventUserRequest();
-        newBody.setStateAction(newState);
+        newBody.setStateAction(EventStateAction.from(newState));
 
         final Event baseEvent = eventList.get(2);
         final Event updatedEvent = baseEvent.toBuilder().state(EventState.PUBLISHED).build();
@@ -283,7 +284,7 @@ class PrivetEventServiceImplTest {
     @ValueSource(strings = {"PUBLISH_EVENT", "REJECT_EVENT"})
     void updateEvent_throwException_whenWrongState(String newState) {
         final UpdateEventUserRequest newBody = new UpdateEventUserRequest();
-        newBody.setStateAction(newState);
+        newBody.setStateAction(EventStateAction.from(newState));
 
         final Event baseEvent = eventList.get(2);
 
@@ -299,7 +300,7 @@ class PrivetEventServiceImplTest {
     void updateEvent_throwException_whenEventPUBLISHED() {
         final Event baseEvent = eventList.get(0);
         final UpdateEventUserRequest newBody = new UpdateEventUserRequest();
-        newBody.setStateAction("PUBLISH_EVENT");
+        newBody.setStateAction(EventStateAction.from("PUBLISH_EVENT"));
 
         doNothing().when(userService).checkExistById(anyLong());
         when(repository.findByIdAndInitiatorId(anyLong(), anyLong())).thenReturn(Optional.ofNullable(baseEvent));
@@ -307,24 +308,6 @@ class PrivetEventServiceImplTest {
         final ConflictException exception = assertThrows(ConflictException.class,
                 () -> service.updateEventByUser(newBody, userId, eventId));
         assertEquals("Event state is Published", exception.getMessage());
-
-        verify(repository, never()).save(new Event());
-    }
-
-    @Test
-    void updateEvent_throwException_withUnknownState() {
-        final String wrongState = "WRONG_STATE";
-        final UpdateEventUserRequest newBody = new UpdateEventUserRequest();
-        newBody.setStateAction(wrongState);
-
-        final Event baseEvent = eventList.get(2);
-
-        doNothing().when(userService).checkExistById(anyLong());
-        when(repository.findByIdAndInitiatorId(anyLong(), anyLong())).thenReturn(Optional.ofNullable(baseEvent));
-
-        final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> service.updateEventByUser(newBody, userId, eventId));
-        assertEquals("Unknown event state action: " + wrongState, exception.getMessage());
 
         verify(repository, never()).save(new Event());
     }

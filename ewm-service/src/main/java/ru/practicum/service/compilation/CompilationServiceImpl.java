@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.dto.compilation.CompilationDto;
 import ru.practicum.dto.compilation.NewCompilationDto;
 import ru.practicum.dto.compilation.UpdateCompilationRequest;
@@ -25,7 +24,6 @@ import static ru.practicum.utils.Constants.THE_REQUIRED_OBJECT_WAS_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class CompilationServiceImpl implements CompilationService {
 
     private final CompilationRepository compilationRepository;
@@ -58,7 +56,6 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
-    @Transactional
     public CompilationDto saveCompilation(NewCompilationDto body) {
         try {
             final List<Long> eventIdList = body.getEvents();
@@ -74,7 +71,6 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
-    @Transactional
     public void delete(long compId) {
         if (!compilationRepository.existsById(compId)) {
             throw new NotFoundException(
@@ -85,7 +81,6 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
-    @Transactional
     public CompilationDto updateCompilation(UpdateCompilationRequest body, long compId) {
         final Compilation compilation = findCompilationById(compId);
 

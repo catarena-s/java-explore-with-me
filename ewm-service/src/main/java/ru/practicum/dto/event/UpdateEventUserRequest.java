@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import ru.practicum.dto.location.LocationDto;
+import ru.practicum.enums.EventStateAction;
 
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
@@ -38,5 +39,5 @@ public class UpdateEventUserRequest {
     private Boolean paid;
     private Integer participantLimit;
     private Boolean requestModeration;
-    private String stateAction;
+    private EventStateAction stateAction;
 }

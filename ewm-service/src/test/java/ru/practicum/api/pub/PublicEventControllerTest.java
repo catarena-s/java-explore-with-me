@@ -67,13 +67,13 @@ class PublicEventControllerTest {
     @Test
     void getPublishedEvents() throws Exception {
         when(eventService.getPublishedEvents(anyString(), anyList(), anyBoolean(), any(), any(), anyBoolean(),
-                anyString(), anyInt(), anyInt(), any())
+                any(), anyInt(), anyInt(), any())
         ).thenReturn(eventFullDtoList);
 
         mvc.perform(get("/events")
                         .param("text", "text")
                         .param("users", "1", "2")
-//                        .param("states","1","2")
+                        .param("sort","VIEWS")
                         .param("categories", "1", "2")
                         .param("from", "0")
                         .param("size", "10")

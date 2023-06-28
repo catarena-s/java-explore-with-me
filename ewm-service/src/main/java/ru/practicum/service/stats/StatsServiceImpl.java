@@ -20,11 +20,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static ru.practicum.utils.Constants.END;
+import static ru.practicum.utils.Constants.START;
+
 @Service
 @RequiredArgsConstructor
 public class StatsServiceImpl implements StatsService {
-    public static final LocalDateTime START = LocalDateTime.of(1900, 1, 1, 0, 0, 0);
-    public static final LocalDateTime END = LocalDateTime.of(2222, 12, 31, 23, 59, 59);
     @Autowired
     private final StatsClient statsClient;
     @Value(value = "${app.name}")

@@ -3,6 +3,7 @@ package ru.practicum.api.admin;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,6 +28,7 @@ import static ru.practicum.Constants.YYYY_MM_DD_HH_MM_SS;
 @RequestMapping("/admin/events")
 @RequiredArgsConstructor
 @Slf4j
+@Validated
 public class AdminEventController {
     private final EventService eventService;
 

@@ -1,12 +1,15 @@
 package ru.practicum.exception;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.fasterxml.jackson.databind.exc.ValueInstantiationException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.PropertyValueException;
+import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -31,6 +34,22 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @RestControllerAdvice
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ErrorHandler {
+    @ExceptionHandler
+    @ResponseStatus(BAD_REQUEST)
+    public ApiError handleHttpMessageNotReadableException(final HttpMessageNotReadableException e) {
+        Throwable cause = e.getCause();
+        String msg;
+        if (cause instanceof ValueInstantiationException) {
+            ValueInstantiationException vie = (ValueInstantiationException) cause;
+            msg = vie.getOriginalMessage();
+        } else msg = e.getMessage();
+        return ApiError.builder()
+                .reason("Http message not readable exception")
+                .status(BAD_REQUEST.toString())
+                .message(msg)
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
 
     @ExceptionHandler
     @ResponseStatus(BAD_REQUEST)
@@ -44,7 +63,7 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(BAD_REQUEST)//+
+    @ResponseStatus(BAD_REQUEST)
     public ApiError handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         String format = "Field: '%s'. Error: %s.";
         Map<String, String> errors = new HashMap<>();
@@ -53,7 +72,6 @@ public class ErrorHandler {
             String errorMessage = String.format(format, ((FieldError) error).getRejectedValue(), error.getDefaultMessage());
             errors.put(fieldName, errorMessage);
         });
-
         return ApiError.builder()
                 .reason("Incorrectly made request.")
                 .status(BAD_REQUEST.toString())
@@ -65,10 +83,17 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(BAD_REQUEST)
     public ApiError handleMethodArgumentTypeMismatchException(final MethodArgumentTypeMismatchException e) {
+        Throwable cause = e.getCause();
+        String msg;
+        if (cause instanceof ConversionFailedException) {
+            ConversionFailedException cfe = (ConversionFailedException) cause;
+            Throwable mostSpecificCause = cfe.getMostSpecificCause();
+            msg = mostSpecificCause.getMessage();
+        } else msg = e.getMessage();
         return ApiError.builder()
                 .reason("Method argument type mismatch")
                 .status(BAD_REQUEST.toString())
-                .message(e.getMessage())
+                .message(msg)
                 .timestamp(LocalDateTime.now())
                 .build();
     }
@@ -96,8 +121,8 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(BAD_REQUEST)//+
-    public ApiError handleMissingRequestValueException(final ConstraintViolationException e) {
+    @ResponseStatus(BAD_REQUEST)
+    public ApiError handleConstraintViolationException(final ConstraintViolationException e) {
         return ApiError.builder()
                 .reason("Constraint violation exception")
                 .status(BAD_REQUEST.toString())
@@ -132,9 +157,9 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(BAD_REQUEST)
-    public ApiError handleValidateException2(final InvalidFormatException e) {
+    public ApiError handleInvalidFormatException(final InvalidFormatException e) {
         return ApiError.builder()
-                .reason("IllegalArgumentException")
+                .reason("Illegal argument exception")
                 .status(BAD_REQUEST.name())
                 .message(e.getMessage())
                 .timestamp(LocalDateTime.now())
@@ -144,8 +169,6 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(INTERNAL_SERVER_ERROR)
     public ApiError handleInternalServerError(final Throwable e) {
-        log.error(e.toString());
-        log.error(e.getMessage());
         return ApiError.builder()
                 .reason("An unexpected error has occurred")
                 .status(INTERNAL_SERVER_ERROR.name())

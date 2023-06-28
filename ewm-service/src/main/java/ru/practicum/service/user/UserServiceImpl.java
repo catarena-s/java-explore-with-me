@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.dto.user.NewUserRequest;
 import ru.practicum.dto.user.UserDto;
 import ru.practicum.exception.ConflictException;
@@ -24,14 +23,12 @@ import static ru.practicum.utils.Constants.USER_WITH_ID_D_WAS_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
     private final RequestRepository requestRepository;
 
     @Override
-    @Transactional
     public UserDto registerUser(NewUserRequest body) {
         try {
             User user = userRepository.save(UserMapper.fromDto(body));
@@ -45,7 +42,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-
     public List<UserDto> getUsers(List<Long> ids, Integer from, Integer size) {
         final PageRequest page = PageRequest.of(from / size, size);
         final List<User> users = (ids == null || ids.isEmpty())
@@ -58,7 +54,6 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    @Transactional
     public void delete(long userId) {
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException(

@@ -3,8 +3,8 @@ package ru.practicum.validation;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import ru.practicum.dto.request.EventRequestStatusUpdateRequest;
+import ru.practicum.enums.RequestStatus;
 
 import java.util.Collections;
 import java.util.List;
@@ -16,7 +16,7 @@ class EventRequestStatusUpdateRequestTest {
     @Test
     void create_withOutRequestList() {
         final EventRequestStatusUpdateRequest requestForUpdateStatus = EventRequestStatusUpdateRequest.builder()
-                .status("STATUS")
+                .status(RequestStatus.CONFIRMED)
                 .build();
         assertTrue(hasErrorMessage(requestForUpdateStatus, "RequestId list cannot be null."));
     }
@@ -25,15 +25,14 @@ class EventRequestStatusUpdateRequestTest {
     void create_withEmptyRequestList() {
         final EventRequestStatusUpdateRequest requestForUpdateStatus = EventRequestStatusUpdateRequest.builder()
                 .requestIds(Collections.emptyList())
-                .status("STATUS")
+                .status(RequestStatus.CONFIRMED)
                 .build();
         assertTrue(hasErrorMessage(requestForUpdateStatus, "RequestId list cannot be empty."));
     }
 
     @ParameterizedTest
     @NullSource
-    @ValueSource(strings = {" ", "               ", "",})
-    void create_withEmptyStatus(String status) {
+    void create_withEmptyStatus(RequestStatus status) {
         final EventRequestStatusUpdateRequest requestForUpdateStatus = EventRequestStatusUpdateRequest.builder()
                 .requestIds(List.of(1L))
                 .status(status)

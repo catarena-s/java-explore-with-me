@@ -335,7 +335,7 @@ class RequestServiceTest {
     void changeRequestStatus_setCONFIRMED_whenParticipantLimitNot_0() {
         final EventRequestStatusUpdateRequest updateRequest = EventRequestStatusUpdateRequest.builder()
                 .requestIds(List.of(1L))
-                .status("CONFIRMED")
+                .status(CONFIRMED)
                 .build();
 
         final EventRequestStatusUpdateResult expectedRequest = EventRequestStatusUpdateResult.builder()
@@ -359,7 +359,7 @@ class RequestServiceTest {
 
         final EventRequestStatusUpdateRequest updateRequest = EventRequestStatusUpdateRequest.builder()
                 .requestIds(List.of(1L, 2L))
-                .status("CONFIRMED")
+                .status(CONFIRMED)
                 .build();
 
         final EventRequestStatusUpdateResult expectedRequest = EventRequestStatusUpdateResult.builder()
@@ -383,7 +383,7 @@ class RequestServiceTest {
     void changeRequestStatus_throwException_whenSetCansel() {
         final EventRequestStatusUpdateRequest updateRequest = EventRequestStatusUpdateRequest.builder()
                 .requestIds(List.of(1L))
-                .status("CANCELED")
+                .status(CANCELED)
                 .build();
 
         doNothing().when(userService).checkExistById(1L);
@@ -403,7 +403,7 @@ class RequestServiceTest {
     void changeRequestStatus_throwException_whenSetCONFIRMED_whenParticipantLimitNot_And_ConfirmedRequests() {
         final EventRequestStatusUpdateRequest updateRequest = EventRequestStatusUpdateRequest.builder()
                 .requestIds(List.of(2L))
-                .status("CONFIRMED")
+                .status(CONFIRMED)
                 .build();
 
         final Event event = eventList.get(5);
@@ -420,7 +420,7 @@ class RequestServiceTest {
     void changeRequestStatus_setREJECTED_whenParticipantLimitNot_0() {
         final EventRequestStatusUpdateRequest updateRequest = EventRequestStatusUpdateRequest.builder()
                 .requestIds(List.of(1L))
-                .status("REJECTED")
+                .status(REJECTED)
                 .build();
 
         final EventRequestStatusUpdateResult expectedRequest = EventRequestStatusUpdateResult.builder()
@@ -443,7 +443,7 @@ class RequestServiceTest {
     void changeRequestStatus_throwException_whenUserNotInitiator() {
         final EventRequestStatusUpdateRequest updateRequest = EventRequestStatusUpdateRequest.builder()
                 .requestIds(List.of(1L))
-                .status("REJECTED")
+                .status(REJECTED)
                 .build();
 
         doNothing().when(userService).checkExistById(userId2);
@@ -461,7 +461,7 @@ class RequestServiceTest {
     void changeRequestStatus_setCONFIRMED_whenParticipantLimit_0() {
         final EventRequestStatusUpdateRequest updateRequest = EventRequestStatusUpdateRequest.builder()
                 .requestIds(List.of(1L))
-                .status("CONFIRMED")
+                .status(CONFIRMED)
                 .build();
 
         final EventRequestStatusUpdateResult expectedRequest = EventRequestStatusUpdateResult.builder()
@@ -486,7 +486,7 @@ class RequestServiceTest {
     void changeRequestStatus_setCONFIRMED_whenIsRequestModeration_False() {
         final EventRequestStatusUpdateRequest updateRequest = EventRequestStatusUpdateRequest.builder()
                 .requestIds(List.of(1L))
-                .status("CONFIRMED")
+                .status(CONFIRMED)
                 .build();
 
         final EventRequestStatusUpdateResult expectedRequest = EventRequestStatusUpdateResult.builder()
@@ -512,7 +512,7 @@ class RequestServiceTest {
     void changeRequestStatus_throwException_whenEventNotExist() {
         final EventRequestStatusUpdateRequest updateRequest = EventRequestStatusUpdateRequest.builder()
                 .requestIds(List.of(1L))
-                .status("CONFIRMED")
+                .status(CONFIRMED)
                 .build();
 
         doNothing().when(userService).checkExistById(anyLong());
@@ -529,28 +529,10 @@ class RequestServiceTest {
     }
 
     @Test
-    void changeRequestStatus_throwException_whenUnknownStatus() {
-        final EventRequestStatusUpdateRequest updateRequest = EventRequestStatusUpdateRequest.builder()
-                .requestIds(List.of(1L, 2L))
-                .status("WRONG STATUS")
-                .build();
-
-        final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> service.changeRequestStatus(updateRequest, userId2, eventId));
-        assertEquals("Unknown request status: WRONG STATUS", exception.getMessage());
-
-        verify(userService, never()).checkExistById(userId2);
-        verify(eventRepository, never()).findById(eventId);
-        verify(repository, never()).findByIdAndRequesterId(1L, userId2);
-        verify(eventRepository, never()).save(event);
-        verify(repository, never()).saveAll(Collections.emptyList());
-    }
-
-    @Test
     void changeRequestStatus_throwException_whenNotAllRequestsPending() {
         final EventRequestStatusUpdateRequest updateRequest = EventRequestStatusUpdateRequest.builder()
                 .requestIds(List.of(1L, 3L))
-                .status("CONFIRMED")
+                .status(CONFIRMED)
                 .build();
 
         doNothing().when(userService).checkExistById(anyLong());

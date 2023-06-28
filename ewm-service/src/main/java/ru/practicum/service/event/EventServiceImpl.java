@@ -43,16 +43,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static ru.practicum.enums.EventState.*;
 import static ru.practicum.enums.EventStateAction.CANCEL_REVIEW;
 import static ru.practicum.enums.EventStateAction.PUBLISH_EVENT;
 import static ru.practicum.enums.EventStateAction.REJECT_EVENT;
 import static ru.practicum.enums.EventStateAction.SEND_TO_REVIEW;
 import static ru.practicum.utils.Constants.EVENT_WITH_ID_D_WAS_NOT_FOUND;
+import static ru.practicum.utils.Constants.START;
 import static ru.practicum.utils.Constants.THE_REQUIRED_OBJECT_WAS_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class EventServiceImpl implements EventService {
     private static final String EVENT_DATE_AND_TIME_IS_BEFORE = "Event date and time cannot be earlier than %d hours from the";
     private final EventRepository eventRepository;
@@ -71,7 +72,7 @@ public class EventServiceImpl implements EventService {
         final Category category = categoryService.findCategoryById(body.getCategory());
         final Location location = locationService.findLocation(body.getLocation());
 
-        final Event event = EventMapper.fromDto(body, user, category, location, EventState.PENDING, LocalDateTime.now());
+        final Event event = EventMapper.fromDto(body, user, category, location, PENDING, LocalDateTime.now());
 
         return EventMapper.toFullDto(eventRepository.save(event));
     }
@@ -128,7 +129,7 @@ public class EventServiceImpl implements EventService {
      */
     @Override
     public EventFullDto getPublishedEvent(long eventId, HttpServletRequest request) {
-        final Event event = eventRepository.findByIdAndState(eventId, EventState.PUBLISHED)
+        final Event event = eventRepository.findByIdAndState(eventId, PUBLISHED)
                 .orElseThrow(() -> new NotFoundException(
                         String.format(EVENT_WITH_ID_D_WAS_NOT_FOUND, eventId),
                         THE_REQUIRED_OBJECT_WAS_NOT_FOUND));
@@ -152,7 +153,7 @@ public class EventServiceImpl implements EventService {
     public List<EventShortDto> getPublishedEvents(String text, List<Long> categories, Boolean paid,
                                                   LocalDateTime rangeStart, LocalDateTime rangeEnd,
                                                   Boolean onlyAvailable,
-                                                  String sort,//по дате события или по количеству просмотров
+                                                  SortType sort,//по дате события или по количеству просмотров
                                                   Integer from, Integer size, HttpServletRequest request) {
         confirmStartBeforeEnd(rangeStart, rangeEnd);
 
@@ -170,8 +171,9 @@ public class EventServiceImpl implements EventService {
         List<EventShortDto> eventShortDtoList = events.stream()
                 .map(event -> EventMapper.toShortDto(event, getView(request, mapViewStats, event.getId())))
                 .collect(Collectors.toList());
+
         return needSortByViews(sort)
-                ? eventShortDtoList.stream().sorted(Comparator.comparing(EventShortDto::getViews)).collect(Collectors.toList())
+                ? getSortedList(eventShortDtoList)
                 : eventShortDtoList;
 
     }
@@ -183,7 +185,7 @@ public class EventServiceImpl implements EventService {
         userService.checkExistById(userId);
         final Event event = getEventForUser(userId, eventId);
 
-        if (event.getState().equals(EventState.PUBLISHED)) {
+        if (event.getState().equals(PUBLISHED)) {
             throw new ConflictException("Event state is Published", "ConflictException");
         }
         updateData(event, body.getAnnotation(),
@@ -247,7 +249,7 @@ public class EventServiceImpl implements EventService {
         final LocalDateTime start = events.stream()
                 .map(Event::getPublishedOn)
                 .min(LocalDateTime::compareTo)
-                .get();
+                .orElse(START);
         final LocalDateTime end = LocalDateTime.now();
         final List<Long> collect = events.stream()
                 .map(Event::getId)
@@ -255,8 +257,8 @@ public class EventServiceImpl implements EventService {
         return statsService.getMap(request, collect, start, end, unique);
     }
 
-    private boolean needSortByViews(String sort) {
-        return sort != null && sort.equalsIgnoreCase("VIEWS");
+    private boolean needSortByViews(SortType sort) {
+        return sort != null && sort.equals(SortType.VIEWS);
     }
 
     private List<Predicate> getPredicates(String text,
@@ -272,7 +274,7 @@ public class EventServiceImpl implements EventService {
                 .categoryIn(categories)
                 .eventDateAfter(rangeStart)
                 .eventDateBefore(rangeEnd)
-                .stateEq(EventState.PUBLISHED)
+                .stateEq(PUBLISHED)
                 .build();
 
         final Predicate mainPredicate = EventPredicate.getAndEventPredicate(mainFilter);
@@ -288,14 +290,13 @@ public class EventServiceImpl implements EventService {
         return predicateList;
     }
 
-    private PageRequest getPageRequest(String sort, Integer from, Integer size) {
+    private PageRequest getPageRequest(SortType sort, Integer from, Integer size) {
         return (sort == null)
                 ? PageRequest.of(from / size, size)
                 : getPageRequestWithSort(from, size, sort);
     }
 
-    private PageRequest getPageRequestWithSort(Integer from, Integer size, String sort) {
-        final SortType sortType = SortType.from(sort);
+    private PageRequest getPageRequestWithSort(Integer from, Integer size, SortType sortType) {
         return sortType.equals(SortType.VIEWS)
                 ? PageRequest.of(from / size, size)
                 : PageRequest.of(from / size, size).withSort(Sort.by(sortType.getName()));
@@ -349,52 +350,36 @@ public class EventServiceImpl implements EventService {
 
     /** Обновление статуса для public api */
     private void updateStatusByUser(UpdateEventUserRequest body, Event event) {
+        final EventStateAction newEventState = body.getStateAction();
+        if (newEventState == null) return;
+
         final Set<EventStateAction> availableStats = Set.of(CANCEL_REVIEW, SEND_TO_REVIEW);
-        final String status = body.getStateAction();
-        if (status != null) {
-            final EventStateAction newEventState = EventStateAction.from(status);
-            checkStatus(availableStats, newEventState);
-            event.setState(newEventState.getEventState());
-        }
+        checkStatus(availableStats, newEventState);
+        event.setState(newEventState.getEventState());
     }
 
     /** Обновление статуса admin api */
     private void updateStatusByAdmin(UpdateEventAdminRequest body, Event event) {
-        final String bodyStateAction = body.getStateAction();
-        if (bodyStateAction == null) return;
+        final EventStateAction newEventState = body.getStateAction();
+        if (newEventState == null) return;
 
         final Set<EventStateAction> availableStats = Set.of(PUBLISH_EVENT, REJECT_EVENT);
-        final EventStateAction newEventState = EventStateAction.from(bodyStateAction);
         checkStatus(availableStats, newEventState);
 
         final EventState currentEventState = event.getState();
         if (PUBLISH_EVENT.equals(newEventState)) {
-            if (EventState.PUBLISHED.equals(currentEventState)) {
-                throw new ConflictException(getConflictStateMessage(EventState.PUBLISHED, EventState.PUBLISHED));
-            }
-            if (EventState.CANCELED.equals(currentEventState)) {
-                throw new ConflictException(getConflictStateMessage(EventState.PUBLISHED, EventState.CANCELED));
-            }
+            throwIfNotAvailableStatus(Set.of(PUBLISHED, CANCELED), currentEventState, newEventState);
             event.setPublishedOn(LocalDateTime.now());
         } else if (REJECT_EVENT.equals(newEventState)) {
-            if (EventState.PUBLISHED.equals(currentEventState)) {
-                throw new ConflictException(getConflictStateMessage(EventState.CANCELED, EventState.PUBLISHED));
-            } else if (EventState.CANCELED.equals(currentEventState)) {
-                throw new ConflictException(getConflictStateMessage(EventState.CANCELED, EventState.CANCELED));
-            }
+            throwIfNotAvailableStatus(Set.of(PUBLISHED, CANCELED), currentEventState, newEventState);
         }
         event.setState(newEventState.getEventState());
-    }
-
-    private static String getConflictStateMessage(EventState newStatus, EventState currentStatus) {
-        return String.format(Constants.YOU_CANNOT_S_EVENT_WHEN_CURRENT_STATUS_S,
-                newStatus.name(), currentStatus.name());
     }
 
     private void updateEventDate(LocalDateTime newEventDate, Event event, int difHour) {
         if (newEventDate != null) {
             confirmEventDateIsAfterCurrent(newEventDate, difHour);
-            if (EventState.PUBLISHED.equals(event.getState())) {
+            if (PUBLISHED.equals(event.getState())) {
                 LocalDateTime publishedDate = event.getPublishedOn();
                 confirmEventDateIsAfterPublished(newEventDate, publishedDate, difHour);
                 event.setEventDate(newEventDate);
@@ -445,5 +430,18 @@ public class EventServiceImpl implements EventService {
             throw new ConflictException(String.format("Wrong status. Status should be one of: %s",
                     set.stream().sorted().collect(Collectors.toList())));
         }
+    }
+
+    private void throwIfNotAvailableStatus(Set<EventState> set, EventState currentEventState, EventStateAction newEventState) {
+        if (set.contains(currentEventState)) {
+            throw new ConflictException(String.format(Constants.IMPOSSIBLE_S_WHEN_EVENT_STATUS_ONE_OF_S_CURRENT_STATUS_S,
+                    newEventState, set.stream().sorted().collect(Collectors.toList()), currentEventState));
+        }
+    }
+
+    private List<EventShortDto> getSortedList(List<EventShortDto> eventShortDtoList) {
+        return eventShortDtoList.stream()
+                .sorted(Comparator.comparing(EventShortDto::getViews))
+                .collect(Collectors.toList());
     }
 }

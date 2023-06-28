@@ -34,6 +34,7 @@ import ru.practicum.utils.Constants;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -48,9 +49,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static ru.practicum.Constants.FORMATTER;
+import static ru.practicum.enums.EventState.CANCELED;
+import static ru.practicum.enums.EventState.PUBLISHED;
 import static ru.practicum.utils.Constants.CATEGORY_WITH_ID_D_WAS_NOT_FOUND;
 import static ru.practicum.utils.Constants.EVENT_WITH_ID_D_WAS_NOT_FOUND;
-import static ru.practicum.utils.Constants.YOU_CANNOT_S_EVENT_WHEN_CURRENT_STATUS_S;
+import static ru.practicum.utils.Constants.IMPOSSIBLE_S_WHEN_EVENT_STATUS_ONE_OF_S_CURRENT_STATUS_S;
 import static ru.practicum.utils.TestInitDataUtil.getCategoryList;
 import static ru.practicum.utils.TestInitDataUtil.getEventList;
 import static ru.practicum.utils.TestInitDataUtil.getUserList;
@@ -79,6 +82,9 @@ class AdminEventServiceImplTest {
     private List<Long> userIdList;
     private Event eventPending;
     private Event eventPublished;
+    private final List<EventState> eventStateSet = Set.of(CANCELED, PUBLISHED).stream()
+            .sorted()
+            .collect(Collectors.toList());
 
     @BeforeEach
     void setUp() {
@@ -208,7 +214,7 @@ class AdminEventServiceImplTest {
     })
     void updateEventByAdmin_setPUBLISHED_whenCorrectStat(String newStatus, String eventState, int eventIndex) {
         final UpdateEventAdminRequest newBody = new UpdateEventAdminRequest();
-        newBody.setStateAction(newStatus);
+        newBody.setStateAction(EventStateAction.from(newStatus));
         final EventStateAction stateAction = EventStateAction.from(newStatus);
         final EventState newEventState = stateAction.getEventState();
         final EventState currentState = EventState.from(eventState);
@@ -234,93 +240,28 @@ class AdminEventServiceImplTest {
         verify(repository, times(1)).save(updatedEvent);
     }
 
-
-    @Test
-    void updateEventByAdmin_setPUBLISHED_whenEventPUBLISHED() {
+    @ParameterizedTest
+    @CsvSource({
+            "PUBLISH_EVENT, PUBLISHED, 0",
+            "PUBLISH_EVENT, CANCELED , 4",
+            "REJECT_EVENT , PUBLISHED, 0",
+            "REJECT_EVENT , CANCELED , 4"
+    })
+    void updateEventByAdmin_throwException_whenSetNewStatus(String newStatus, String currentStatus, int eventIndex) {
         final UpdateEventAdminRequest newBody = new UpdateEventAdminRequest();
-        newBody.setStateAction("PUBLISH_EVENT");
-        final Event publishedEvent = eventList.get(0);
+        newBody.setStateAction(EventStateAction.from(newStatus));
+        final Event publishedEvent = eventList.get(eventIndex);
+        final Long eventId = publishedEvent.getId();
 
         when(repository.findById(anyLong())).thenReturn(Optional.of(publishedEvent));
 
         final ConflictException exception = assertThrows(ConflictException.class,
                 () -> adminService.updateEventByAdmin(newBody, eventId));
-        assertEquals("You cannot PUBLISHED event when current status PUBLISHED", exception.getMessage());
+        assertEquals(String.format(IMPOSSIBLE_S_WHEN_EVENT_STATUS_ONE_OF_S_CURRENT_STATUS_S,
+                newBody.getStateAction(), eventStateSet, EventState.from(currentStatus)), exception.getMessage());
 
         verify(repository, times(1)).findById(eventId);
         verify(repository, never()).save(new Event());
-    }
-
-    @Test
-    void updateEventByAdmin_setREJECT_whenEventPUBLISHED() {
-        final UpdateEventAdminRequest newBody = new UpdateEventAdminRequest();
-        newBody.setStateAction("REJECT_EVENT");
-        final Event publishedEvent = eventList.get(0);
-
-        when(repository.findById(anyLong())).thenReturn(Optional.of(publishedEvent));
-
-        final ConflictException exception = assertThrows(ConflictException.class,
-                () -> adminService.updateEventByAdmin(newBody, eventId));
-        assertEquals(String.format(YOU_CANNOT_S_EVENT_WHEN_CURRENT_STATUS_S, EventState.CANCELED, EventState.PUBLISHED),
-                exception.getMessage());
-
-        verify(repository, times(1)).findById(eventId);
-        verify(repository, never()).save(new Event());
-    }
-
-    @Test
-    void updateEventByAdmin_setREJECT_whenEventCANCELED() {
-        final UpdateEventAdminRequest newBody = new UpdateEventAdminRequest();
-        newBody.setStateAction("REJECT_EVENT");
-        final Event canceledEvent = eventList.get(4);
-
-        when(repository.findById(anyLong())).thenReturn(Optional.of(canceledEvent));
-
-        final ConflictException exception = assertThrows(ConflictException.class,
-                () -> adminService.updateEventByAdmin(newBody, eventId));
-        assertEquals(
-                String.format(YOU_CANNOT_S_EVENT_WHEN_CURRENT_STATUS_S, EventState.CANCELED, EventState.CANCELED),
-                exception.getMessage());
-
-        verify(repository, times(1)).findById(eventId);
-        verify(repository, never()).save(new Event());
-    }
-
-
-    @Test
-    void updateEventByAdmin_throwException_whenSetPUBLISHED_whenEventCANCELD() {
-        final UpdateEventAdminRequest newBody = new UpdateEventAdminRequest();
-        newBody.setStateAction("PUBLISH_EVENT");
-
-        final Event canceledEvent = eventList.get(4);
-
-        when(repository.findById(anyLong())).thenReturn(Optional.of(canceledEvent));
-
-        final ConflictException exception = assertThrows(ConflictException.class,
-                () -> adminService.updateEventByAdmin(newBody, eventId));
-        assertEquals(String.format(YOU_CANNOT_S_EVENT_WHEN_CURRENT_STATUS_S, EventState.PUBLISHED, EventState.CANCELED),
-                exception.getMessage());
-
-        verify(repository, times(1)).findById(eventId);
-        verify(repository, never()).save(new Event());
-    }
-
-    @Test
-    void updateEventByAdmin_throwException_whenUnknownState() {
-        final UpdateEventAdminRequest newBody = new UpdateEventAdminRequest();
-        newBody.setStateAction("WRONG_STATE");
-
-        final Event updatedEvent = getUpdatedEvent(newBody, eventPending);
-
-        when(repository.findById(anyLong())).thenReturn(Optional.of(eventPending));
-
-        final IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> adminService.updateEventByAdmin(newBody, eventId));
-
-        assertEquals("Unknown event state action: WRONG_STATE", exception.getMessage());
-
-        verify(repository, times(1)).findById(eventId);
-        verify(repository, never()).save(updatedEvent);
     }
 
     @ParameterizedTest
