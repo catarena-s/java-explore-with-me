@@ -25,7 +25,7 @@ public class StatsClient {
     private final RestTemplate restTemplate;
 
     @Autowired
-    public StatsClient(@Value("${ewm-stats-server-client.url}") String serverUrl) {
+    public StatsClient(@Value("${ewm-stats-server.url}") String serverUrl) {
         this.serverUrl = serverUrl;
         this.restTemplate = new RestTemplate();
     }
@@ -43,7 +43,7 @@ public class StatsClient {
             path.add("end={end}");
         }
         if (uris != null && !uris.isEmpty()) {
-            parameters.put("uris", String.join("&uris=", uris));
+            parameters.put("uris", String.join(",", uris));
             path.add("uris={uris}");
         }
 

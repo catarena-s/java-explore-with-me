@@ -43,13 +43,13 @@ public class StatsServerController {
     }
 
     @GetMapping(STATS_ENDPOINT)
-    public List<ViewStatsDto> getStats(@RequestParam(name = "start", required = false)
+    public List<ViewStatsDto> getStats(@RequestParam(name = "start")
                                        @DateTimeFormat(pattern = YYYY_MM_DD_HH_MM_SS)
                                        LocalDateTime start,
-                                       @RequestParam(name = "end", required = false)
+                                       @RequestParam(name = "end")
                                        @DateTimeFormat(pattern = YYYY_MM_DD_HH_MM_SS)
                                        LocalDateTime end,
-                                       @RequestParam(name = "uris", required = false) String[] uris,
+                                       @RequestParam(name = "uris") String[] uris,
                                        @RequestParam(name = "unique", defaultValue = "false") boolean unique
     ) {
         final String pathStr = getPathStr(start, end, uris, unique);
