@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -123,6 +124,32 @@ class PrivateRequestControllerTest {
                 .thenReturn(requestDto1);
 
         mvc.perform(patch("/users/{userId}/requests/{requestId}/cancel", userId, requestId)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void hideParticipation() throws Exception {
+        when(service.changeVisibilityEventParticipation(anyLong(), any(),anyBoolean()))
+                .thenReturn(List.of(requestDto1, requestDto2));
+
+        mvc.perform(patch("/users/{userId}/requests/hide", userId)
+                        .param("ids", "1", "2")
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void showParticipation() throws Exception {
+        when(service.changeVisibilityEventParticipation(anyLong(), any(),anyBoolean()))
+                .thenReturn(List.of(requestDto1, requestDto2));
+
+        mvc.perform(patch("/users/{userId}/requests/show", userId)
+                        .param("ids", "1", "2")
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))

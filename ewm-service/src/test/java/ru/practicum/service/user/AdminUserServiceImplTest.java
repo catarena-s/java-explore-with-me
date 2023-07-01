@@ -65,7 +65,7 @@ class AdminUserServiceImplTest {
     @Test
     void registerUser() {
         final NewUserRequest body = NewUserRequest.builder().name("Jon").email("jon@mail.com").build();
-        final UserDto dto = UserDto.builder().id(1L).name("Jon").email("jon@mail.com").build();
+        final UserDto dto = UserDto.builder().id(1L).name("Jon").email("jon@mail.com").isAutoSubscribe(false).build();
         final User user = TestInitDataUtil.makeUser(1L, "Jon", "jon@mail.com");
         when(repository.save(any())).thenReturn(user);
 

@@ -31,17 +31,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class AdminUserControllerTest {
     @MockBean
     private UserService userService;
-    //    @MockBean
-//    private PublicEventService eventService;
-//    @MockBean
-//    private AdminCategoryService categoryService;
     @Autowired
     private ObjectMapper mapper;
     @Autowired
     private MockMvc mvc;
     private UserDto userDto;
-//    private List<EventFullDto> eventFullDtoList;
-//    private CategoryDto categoryDto;
 
     @BeforeEach
     void setUp() {
@@ -50,14 +44,6 @@ class AdminUserControllerTest {
                 .name("John")
                 .email("john.doe@mail.com")
                 .build();
-//        categoryDto = CategoryDto.builder()
-//                .name("Cinema")
-//                .build();
-//
-//        eventFullDtoList = getEventList(getCategoryList(), getUserList())
-//                .stream()
-//                .map(EventMapper::toFullDto)
-//                .collect(Collectors.toList());
 
     }
 
@@ -87,10 +73,7 @@ class AdminUserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                /*.andExpect(jsonPath("$.id", is(userDto.getId()), Long.class))
-                .andExpect(jsonPath("$.name", is(userDto.getName())))
-                .andExpect(jsonPath("$.email", is(userDto.getEmail())))*/;
+                .andExpect(jsonPath("$", hasSize(1)));
     }
 
     @Test
@@ -105,10 +88,7 @@ class AdminUserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                /*.andExpect(jsonPath("$.id", is(userDto.getId()), Long.class))
-                .andExpect(jsonPath("$.name", is(userDto.getName())))
-                .andExpect(jsonPath("$.email", is(userDto.getEmail())))*/;
+                .andExpect(jsonPath("$", hasSize(1)));
     }
 
     @Test
