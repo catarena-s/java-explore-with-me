@@ -16,4 +16,6 @@ public interface RequestService {
     List<ParticipationRequestDto> getUserRequests(long userId);
 
     ParticipationRequestDto cancelRequest(long userId, long requestId);
+
+    List<ParticipationRequestDto> changeVisibilityEventParticipation(long userId, List<Long> ids, boolean hide);
 }

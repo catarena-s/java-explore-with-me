@@ -16,6 +16,7 @@ public class RequestMapper {
                 .event(newRequest.getEvent().getId())
                 .status(newRequest.getStatus())
                 .created(newRequest.getCreated().format(FORMATTER))
+                .isPrivate(newRequest.isPrivate())
                 .build();
     }
 }

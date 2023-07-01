@@ -19,4 +19,5 @@ public class ParticipationRequestDto {
     private Long requester;
     private String created;
     private RequestStatus status;
+    private boolean isPrivate;
 }

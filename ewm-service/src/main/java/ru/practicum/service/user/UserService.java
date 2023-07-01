@@ -37,4 +37,6 @@ public interface UserService {
     void checkExistById(long userId);
 
     User findUserById(long userId);
+
+    UserDto changeSubscribeMode(long userId, boolean isAutoSubscribe);
 }

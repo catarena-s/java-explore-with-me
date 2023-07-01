@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.enums.RequestStatus;
+import ru.practicum.enums.FriendshipState;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,24 +24,24 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Entity
 @Data
-@Table(name = "requests")
-public class Request {
+@Table(name = "friendship")
+public class Friendship {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "requester_id")
-    private User requester;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "event_id")
-    private Event event;
+    @JoinColumn(name = "follower_id")
+    private User follower;
 
-    private LocalDateTime created;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "friend_id")
+    private User friend;
+
     @Enumerated(EnumType.STRING)
-    private RequestStatus status;
+    private FriendshipState state;
 
-    @Column(name = "private")
-    private boolean isPrivate;
+    @Column(name = "created_on")
+    private LocalDateTime createdOn;
 }
