@@ -14,7 +14,7 @@
         - пользователь может скрыть или показать события в которых будет принимать участие
         - пользователь может разрешить автоматический прием заявок на дружбу
 
-### [Тесты postman: /postman/feature.json](https://raw.githubusercontent.com/catarena-s/java-explore-with-me/main/postman/feature.json)
+### [Тесты postman: /postman/feature.json](https://raw.githubusercontent.com/catarena-s/java-explore-with-me/feature_subscriptions/postman/feature.json)
 
 ### Swagger API Specification
 ___
@@ -32,12 +32,12 @@ ___
 
 | HTTP request                                                  | Method                                                                             | Description                                                          |
 |---------------------------------------------------------------|------------------------------------------------------------------------------------|----------------------------------------------------------------------|
-| **PATCH** /users/{userId}/friendships/approve?ids={ids}       | [**approveFriendship**](FollowFriend.md#approveFriendship)                         | Подтверждение полученных текущим пользователем запросов на дружбу    |
-| **DELETE** /users/{userId}/friendships/{subsId}               | [**deleteFriendshipRequest**](FollowFriend.md#deleteFriendshipRequest)             | Удалить запрос на дружбу от текущего пользователя                    |
-| **GET** /users/{userId}/friendships/requests?filter={filter}  | [**getFriendshipRequests**](FollowFriend.md#getFriendshipRequests)                 | Получить список заявок на дружбу, отправленных текущим пользователем |
-| **GET** /users/{userId}/friendships/followers?filter={filter} | [**getIncomingFriendshipRequests**](FollowFriend.md#getIncomingFriendshipRequests) | Получить список заявок на дружбу, полученных текущим пользователем   |
-| **PATCH** /users/{userId}/friendships/reject?ids={ids}        | [**rejectFriendship**](FollowFriend.md#rejectFriendship)                           | Отклонение запросов на дружбу полученных текущи пользователем        |
-| **POST** /users/{userId}/friendships/{friendId}               | [**requestFriendship**](FollowFriend.md#requestFriendship)                         | Добавление запроса на дружбу от текущего пользователя                |
+| **PATCH** /users/{userId}/friendships/approve?ids={ids}       | [**approveFriendship**](doc/FollowFriend.md#approveFriendship)                         | Подтверждение полученных текущим пользователем запросов на дружбу    |
+| **DELETE** /users/{userId}/friendships/{subsId}               | [**deleteFriendshipRequest**](doc/FollowFriend.md#deleteFriendshipRequest)             | Удалить запрос на дружбу от текущего пользователя                    |
+| **GET** /users/{userId}/friendships/requests?filter={filter}  | [**getFriendshipRequests**](doc/FollowFriend.md#getFriendshipRequests)                 | Получить список заявок на дружбу, отправленных текущим пользователем |
+| **GET** /users/{userId}/friendships/followers?filter={filter} | [**getIncomingFriendshipRequests**](doc/FollowFriend.md#getIncomingFriendshipRequests) | Получить список заявок на дружбу, полученных текущим пользователем   |
+| **PATCH** /users/{userId}/friendships/reject?ids={ids}        | [**rejectFriendship**](doc/FollowFriend.md#rejectFriendship)                           | Отклонение запросов на дружбу полученных текущи пользователем        |
+| **POST** /users/{userId}/friendships/{friendId}               | [**requestFriendship**](doc/FollowFriend.md#requestFriendship)                         | Добавление запроса на дружбу от текущего пользователя                |
 
 <a name="approveFriendship"></a>
 # **approveFriendship**
@@ -159,10 +159,10 @@ ___
 
 | HTTP request                                                   | Method                                                           | Description                                                               |
 |----------------------------------------------------------------|------------------------------------------------------------------|---------------------------------------------------------------------------|
-| **GET** /users/{userId}/friends/share?from={from}&size={size}  | [**getParticipateEvents**](FollowFriend.md#getParticipateEvents) | Получить события в которых будут участвовать друзья текущего пользователя |
-| **GET** /users/{userId}/friends/events?from={from}&size={size} | [**getFriendEvents**](FollowFriend.md#getFriendEvents)           | Получить список событий опубликованных друзьями текущего пользователя     |
-| **GET** /users/{userId}/friends                                | [**getFriends**](FollowFriend.md#getFriends)                     | Получить список друзей текущего пользователя                              |
-| **GET** /users/{userId}/followers                              | [**getfollowers**](FollowFriend.md#getfollowers)                 | Получить список подписчиков текущего пользователя                         |
+| **GET** /users/{userId}/friends/share?from={from}&size={size}  | [**getParticipateEvents**](doc/FollowFriend.md#getParticipateEvents) | Получить события в которых будут участвовать друзья текущего пользователя |
+| **GET** /users/{userId}/friends/events?from={from}&size={size} | [**getFriendEvents**](doc/FollowFriend.md#getFriendEvents)           | Получить список событий опубликованных друзьями текущего пользователя     |
+| **GET** /users/{userId}/friends                                | [**getFriends**](doc/FollowFriend.md#getFriends)                     | Получить список друзей текущего пользователя                              |
+| **GET** /users/{userId}/followers                              | [**getfollowers**](doc/FollowFriend.md#getfollowers)                 | Получить список подписчиков текущего пользователя                         |
 
 <a name="getParticipateEvents"></a>
 ### **getParticipateEvents**
@@ -247,8 +247,8 @@ ___
 
 | HTTP request                                      | Method                                                     | Description              |
 |---------------------------------------------------|------------------------------------------------------------|--------------------------|
-| **PATCH** /users/{userId}/requests/hide?ids={ids} | [**hideParticipation**](FollowFriend.md#hideParticipation) | Скрыть события от друзей |
-| **PATCH** /users/{userId}/requests/show?ids={ids} | [**showParticipation**](FollowFriend.md#showParticipation) | Показать события друзьям |
+| **PATCH** /users/{userId}/requests/hide?ids={ids} | [**hideParticipation**](doc/FollowFriend.md#hideParticipation) | Скрыть события от друзей |
+| **PATCH** /users/{userId}/requests/show?ids={ids} | [**showParticipation**](doc/FollowFriend.md#showParticipation) | Показать события друзьям |
 
 <a name="hideParticipation"></a>
 ### **hideParticipation**
@@ -291,12 +291,12 @@ ___
 **List&lt;ParticipationRequestDto&gt;**
 
 ___
-## ***Privet User API***
+## ***Privete User API***
 Приватный API для работы с пользователями
 
 | HTTP request                               | Method                                                         | Description             |
 |--------------------------------------------|----------------------------------------------------------------|-------------------------|
-| **PATCH** /users/{userId}/subs?auto={auto} | [**changeSubscribeMode**](FollowFriend.md#changeSubscribeMode) | Изменить режим подписки |
+| **PATCH** /users/{userId}/subs?auto={auto} | [**changeSubscribeMode**](doc/FollowFriend.md#changeSubscribeMode) | Изменить режим подписки |
 
 <a name="changeSubscribeMode"></a>
 ### **changeSubscribeMode**
