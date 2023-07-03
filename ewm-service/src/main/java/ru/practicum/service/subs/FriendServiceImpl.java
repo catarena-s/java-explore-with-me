@@ -2,6 +2,7 @@ package ru.practicum.service.subs;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.dto.event.EventShortDto;
 import ru.practicum.dto.user.UserDto;
 import ru.practicum.enums.EventState;
@@ -36,6 +37,7 @@ public class FriendServiceImpl implements FriendService {
 
     /** Получение списка друзей */
     @Override
+    @Transactional(readOnly = true)
     public List<UserDto> getFriends(long userId) {
         userService.checkExistById(userId);
         final List<User> fiends = getUserList(friendship.friend, friendship.follower, userId);
@@ -43,6 +45,7 @@ public class FriendServiceImpl implements FriendService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<UserDto> getFollowers(long userId) {
         userService.checkExistById(userId);
         final List<User> fiends = getUserList(friendship.follower, friendship.friend, userId);
@@ -51,6 +54,7 @@ public class FriendServiceImpl implements FriendService {
 
     /** Получить список событий в которых примут участие друзья */
     @Override
+    @Transactional(readOnly = true)
     public List<EventShortDto> getParticipateEvents(long followerId, int from, int size) {
         userService.checkExistById(followerId);
         final List<Event> events =
@@ -71,6 +75,7 @@ public class FriendServiceImpl implements FriendService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<EventShortDto> getFriendEvents(long followerId, int from, int size) {
         userService.checkExistById(followerId);
         final List<Event> events =

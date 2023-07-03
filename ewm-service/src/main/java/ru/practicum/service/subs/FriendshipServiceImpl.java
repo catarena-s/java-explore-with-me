@@ -41,6 +41,7 @@ public class FriendshipServiceImpl implements FriendshipService {
      * @return
      */
     @Override
+    @Transactional
     public FriendshipDto requestFriendship(long followerId, long userId) {
         if (followerId == userId) {
             throw new ConflictException("You can't follow yourself.");
@@ -66,6 +67,7 @@ public class FriendshipServiceImpl implements FriendshipService {
      * @return пользователь со списком принятых запросов
      */
     @Override
+    @Transactional
     public List<FriendshipShortDto> approveFriendship(long userId, List<Long> ids) {
         final List<Friendship> subList = friendshipRepository.findAllById(ids);
 
@@ -80,6 +82,7 @@ public class FriendshipServiceImpl implements FriendshipService {
 
     /** Отклонение запроса на дружбу */
     @Override
+    @Transactional
     public List<FriendshipShortDto> rejectFriendship(long userId, List<Long> ids) {
         final List<Friendship> subList = friendshipRepository.findAllById(ids);
 
@@ -94,6 +97,7 @@ public class FriendshipServiceImpl implements FriendshipService {
 
     /** Получить фолловером списка запросов на дружбу */
     @Override
+    @Transactional(readOnly = true)
     public List<FriendshipShortDto> getFriendshipRequests(long userId, String filter) {
         userService.checkExistById(userId);
         throwWhenWrongFilter(filter, Set.of("ALL", PENDING.name(), APPROVED.name(), REJECTED.name()));
@@ -102,6 +106,7 @@ public class FriendshipServiceImpl implements FriendshipService {
 
     /** Получить пользователем списка поданных запросов на дружбу пользователем */
     @Override
+    @Transactional(readOnly = true)
     public List<FriendshipShortDto> getIncomingFriendRequests(long userId, String filter) {
         userService.checkExistById(userId);
         throwWhenWrongFilter(filter, Set.of("ALL", PENDING.name(), APPROVED.name(), REJECTED.name()));
@@ -145,8 +150,8 @@ public class FriendshipServiceImpl implements FriendshipService {
     }
 
     private void confirmFriendshipRequest(List<Friendship> subs, Set<FriendshipState> set) {
-        final boolean noneMatchPending = subs.stream().noneMatch(s -> set.contains(s.getState()));
-        if (noneMatchPending) {
+        final boolean isNotAllStateCorrect = subs.stream().noneMatch(s -> set.contains(s.getState()));
+        if (isNotAllStateCorrect) {
             throw new ConflictException("Status should be one of: " + set);
         }
     }

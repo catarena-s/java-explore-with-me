@@ -67,7 +67,7 @@ public class PrivateFriendshipController {
     @PatchMapping("/approve")
     public List<FriendshipShortDto> approveFriendship(
             @PathVariable("userId") long followerId,
-            @RequestParam(value = "ids", required = false) List<Long> ids) {
+            @RequestParam(value = "ids") List<Long> ids) {
         log.debug("Request received PATCH '/users/{}/friendships/approve?ids={}'", followerId, ids);
         return friendshipService.approveFriendship(followerId, ids);
     }
@@ -80,7 +80,7 @@ public class PrivateFriendshipController {
     @PatchMapping("/reject")
     public List<FriendshipShortDto> rejectFriendship(
             @PathVariable("userId") long followerId,
-            @RequestParam(value = "ids", required = false) List<Long> ids) {
+            @RequestParam(value = "ids") List<Long> ids) {
         log.debug("Request received PATCH '/users/{}/friendships/reject?ids={}'", followerId, ids);
         return friendshipService.rejectFriendship(followerId, ids);
     }
