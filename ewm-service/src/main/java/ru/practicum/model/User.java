@@ -30,4 +30,6 @@ public class User {
     private String email;
     @Column
     private String name;
+    @Column(name = "auto_subscribe")
+    private boolean autoSubscribe;
 }

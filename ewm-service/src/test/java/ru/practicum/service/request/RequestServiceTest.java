@@ -4,6 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -613,5 +615,24 @@ class RequestServiceTest {
 
         verify(userService, times(1)).checkExistById(userId2);
         verify(repository, times(1)).findByIdAndRequesterId(requestId, userId2);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void changeVisibilityEventParticipation(boolean isPrivet) {
+        final Request r1 = request1.toBuilder().status(CONFIRMED).build();
+        final Request r2 = request2.toBuilder().status(CONFIRMED).build();
+        final List<Request> requests = List.of(r1, r2);
+        final List<Request> requestsAfterUpdate = List.of(r1, r2);
+        requestsAfterUpdate.forEach(f -> f.setPrivate(isPrivet));
+        final List<ParticipationRequestDto> dtoExpected = requestsAfterUpdate.stream().map(RequestMapper::toDto).collect(Collectors.toList());
+
+        doNothing().when(userService).checkExistById(anyLong());
+        when(repository.findAllById(any())).thenReturn(requests);
+        when(repository.saveAll(any())).thenReturn(requestsAfterUpdate);
+
+        final long userId = 1L;
+        final List<ParticipationRequestDto> actual = service.changeVisibilityEventParticipation(userId, List.of(1L, 2L), isPrivet);
+        assertEquals(dtoExpected, actual);
     }
 }

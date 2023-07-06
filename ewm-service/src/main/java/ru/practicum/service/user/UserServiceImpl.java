@@ -78,6 +78,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserDto changeSubscribeMode(long userId, boolean isAutoSubscribe) {
+        final User user = findUserById(userId);
+        user.setAutoSubscribe(isAutoSubscribe);
+        userRepository.save(user);
+        return UserMapper.toDto(user);
+    }
+
+    @Override
     public User findUserById(long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(

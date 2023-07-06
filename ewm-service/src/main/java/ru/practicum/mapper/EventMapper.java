@@ -12,6 +12,8 @@ import ru.practicum.model.Location;
 import ru.practicum.model.User;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class EventMapper {
@@ -82,5 +84,11 @@ public class EventMapper {
         return toShortDto(event).toBuilder()
                 .views(hits)
                 .build();
+    }
+
+    public static List<EventShortDto> toDto(List<Event> subs) {
+        return subs.stream()
+                .map(EventMapper::toShortDto)
+                .collect(Collectors.toList());
     }
 }

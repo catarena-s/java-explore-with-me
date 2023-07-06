@@ -56,7 +56,7 @@ import static ru.practicum.utils.TestInitDataUtil.makeNewEventWithCorrectData;
 import static ru.practicum.utils.TestInitDataUtil.makeUser;
 
 @ExtendWith(MockitoExtension.class)
-class PrivetEventServiceImplTest {
+class PrivateEventServiceImplTest {
     @Mock
     private EventRepository repository;
     @Mock
