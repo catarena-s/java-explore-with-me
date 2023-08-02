@@ -1,17 +1,23 @@
-# java-explore-with-me
+# Explore With Me
+Сервис-афиша для размещения информации о событиях(от выставки до похода в кино), на котором пользователи могут находить компанию для участия в них.
+## Стек
+* Java 11
+* Spring Boot
+* Hibernate
+* QueryDSL
+* PostgreSQL
+* Maven
+* Docker
 
-**Pull request**: https://github.com/catarena-s/java-explore-with-me/pull/5
-### Фича: Подписки(вариант 2).
-Подписка на друзей и возможность получать список актуальных событий, в которых они принимают участие.
+## Архитектура
+Сервис состоит из двух модулей:
+1. [Основной сервис](ewm-service/ReadMe.md) — отвечает за обработку информации, которая связана с событиями.
+2. [Сервис статистики](ewm-stats-server/ReadMe.md) — хранит количество просмотров и позволяет делать различные выборки.
 
-### [Описание фичи](ewm-service/FollowFriend.md)
-
-### Схема БД
-___
+## Схема БД
 ![](ewm-service/doc/DB.png)
 
-### Docker start-up guide
-___
+## Docker start-up guide
     mvn clean package
     docker-compose up -d
 
