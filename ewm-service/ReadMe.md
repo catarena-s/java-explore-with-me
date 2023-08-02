@@ -27,7 +27,7 @@ API с тремя уровнями доступа: публичный, прив�
 5. [ ] Администрирование
 
 ## Описание API основного функционала
-[Swagger API Specification](https://raw.githubusercontent.com/catarena-s/java-explore-with-me/main/ewm-service/ewm-main-service-spec.json)
+[Swagger API Specification](https://raw.githubusercontent.com/catarena-s/java-explore-with-me/main/ewm-main-service-spec.json)
 
 ### Public API
 | Method              | HTTP request                   | Description                                                                    |

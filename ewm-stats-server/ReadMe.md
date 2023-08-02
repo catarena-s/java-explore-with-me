@@ -4,7 +4,7 @@
 и позволяет делать различные выборки для анализа работы приложения. 
 
 ## Описание API
-[Swagger API Specification](https://raw.githubusercontent.com/catarena-s/java-explore-with-me/main/ewm-service/ewm-stats-service-spec.json)
+[Swagger API Specification](https://raw.githubusercontent.com/catarena-s/java-explore-with-me/main/ewm-stats-service-spec.json)
 
 | Method       | HTTP request   | Description                                             |
 |--------------|----------------|---------------------------------------------------------|

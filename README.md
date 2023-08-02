@@ -18,7 +18,6 @@
 ![](ewm-service/doc/DB.png)
 
 ## Docker start-up guide
-___
     mvn clean package
     docker-compose up -d
 
