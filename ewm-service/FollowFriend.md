@@ -16,12 +16,8 @@
 
 ### [Тесты postman: /postman/feature.json](https://raw.githubusercontent.com/catarena-s/java-explore-with-me/feature_subscriptions/postman/feature.json)
 
-### Swagger API Specification
-___
-    Feature service - https://raw.githubusercontent.com/catarena-s/java-explore-with-me/main/ewm-service/doc/ewm_feature.json
-
-
-# Описание API
+## Описание API
+[Swagger API Specification](https://raw.githubusercontent.com/catarena-s/java-explore-with-me/main/ewm-service/doc/ewm_feature.json)
 - [Private Friendship API](FollowFriend.md#Private-Friendship-API)
 - [Private Friends API](FollowFriend.md#Private-Friends-API)
 - [Private Request API](FollowFriend.md#Private-Request-API)
@@ -40,7 +36,7 @@ ___
 | **POST** /users/{userId}/friendships/{friendId}               | [**requestFriendship**](FollowFriend.md#requestFriendship)                         | Добавление запроса на дружбу от текущего пользователя                |
 
 <a name="approveFriendship"></a>
-# **approveFriendship**
+### **approveFriendship**
 > List&lt;FriendshipShortDto&gt; approveFriendship(userId, ids)
 
 Подтверждение полученных запросов на дружбу текущим пользователем
